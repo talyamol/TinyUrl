@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', linkController.getAllLinks);
 
 // קבלת לינק לפי ID
-router.get('/:id', linkController.getLinkById);
+// router.get('/:id', linkController.getLinkById);
 
 // יצירת לינק חדש
 router.post('/', linkController.addLink);
@@ -21,7 +21,7 @@ router.delete('/:id', linkController.deleteLink);
 // קבלת כל הלינקים של משתמש לפי userId
 router.get('/user-links/:userId', linkController.getUserLinks);
 
-router.get('/redirect/:id', linkController.redirect);
+router.get('/:id', linkController.redirect);
 router.get('/:id/click-stats', linkController.getClickStats); 
 
 export default router;

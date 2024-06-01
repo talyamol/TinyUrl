@@ -6,14 +6,14 @@ const linkController = {
   redirect: async (req, res) => {
     const { id } = req.params;
     const ipAddress = req.ip; // ניתן לקבל את כתובת ה-IP מהבקשה
-    const targetParamValue = req.query[req.targetParamName] || ""; 
+    // const targetParamValue = req.query[req.targetParamName] ; 
 
     try {
       const link = await Link.findById(id);
       if (!link) {
         return res.status(404).json({ message: "Link not found" });
       }
-
+      const targetParamValue = req.query[link.targetParamName] || "";
       link.clicks.push({ ipAddress, targetParamValue });
       await link.save();
 
@@ -96,8 +96,7 @@ getLinkClicksBySource: async (req, res) => {
   // יצירת לינק חדש
   addLink: async (req, res) => {
     try {
-      const { userId } = req.body; // מקבלים את ה-ID של המשתמש מהבקשה
-      const { originalUrl } = req.body; // מקבלים את ה-URL של הקישור מהבקשה
+      const { userId, originalUrl, clicks, targetParamName, targetValues } = req.body; // מקבלים את כל הנתונים מהבקשה
   
       // מציאת המשתמש במסד הנתונים על ידי ה-ID
       const user = await User.findById(userId);
@@ -105,8 +104,17 @@ getLinkClicksBySource: async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // יצירת הקישור החדש
-      const newLink = await Link.create({ originalUrl });
+      // יצירת הקישור החדש עם כל השדות הנדרשים
+      const newLink = new Link({
+        originalUrl,
+        clicks,
+        targetParamName,
+        targetValues,
+        userId
+      });
+  
+      // שמירת הקישור החדש במסד הנתונים
+      await newLink.save();
   
       // הוספת הקישור למערך הקישורים של המשתמש
       user.links.push(newLink);
